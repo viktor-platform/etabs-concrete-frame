@@ -1,0 +1,3 @@
+app_type = "simple"
+python_version = "3.13"
+registered_name = "etabstest"
