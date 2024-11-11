@@ -1,4 +1,4 @@
-# Sample ETABS App
+# ETABS Concrete Frame
 This app creates a 3D concrete frame by defining two parameters: frame length and height. The model is created in ETABS using the CSI API, then analyzed under the default load case (Dead Load/Self Weight), and the reactions are sent back to the app for visualization in a table view.
 
 ![Table](.viktor-template/tutorial_etabs_sap_webapp.png)
