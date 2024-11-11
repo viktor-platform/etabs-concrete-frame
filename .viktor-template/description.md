@@ -1,4 +1,4 @@
-# ETABS Integration
+# ETABS Concrete Frame
 A VIKTOR sample app which utilizes an ETABS integration.
 
 > **_NOTE:_**  This app requires a worker
