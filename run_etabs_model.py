@@ -2,7 +2,7 @@ import comtypes.client
 import pythoncom
 import json
 from pathlib import Path
-
+ 
 def create_etabs_model():
     # Initialize ETABS model
     program_path=r"C:\Program Files\Computers and Structures\ETABS 22\ETABS.exe"
@@ -17,42 +17,43 @@ def create_etabs_model():
         EtabsObject.File.NewBlank()
     finally:
         pythoncom.CoUninitialize()
+ 
     # Create joints
-    input_json = Path.cwd() / "inputs.json"
+    input_json = Path.cwd() / "inputs.json" #only works when running python from the working directory!
     with open(input_json) as jsonfile:
         data = json.load(jsonfile)
     nodes, lines = data[:]
-
+ 
     # Create nodes
-    for id, node in nodes.items():
+    for node_id, node in nodes.items():
         ret, _ = EtabsObject.PointObj.AddCartesian(
-            node["x"], node["y"], node["z"], " ", str(id)
-        )
-
+            node["x"], node["y"], node["z"], " ", str(node_id))
+ 
     # Create members
     MATERIAL_CONCRETE = 2
     ret = EtabsObject.PropMaterial.SetMaterial("CONC", MATERIAL_CONCRETE)
     ret = EtabsObject.PropMaterial.SetMPIsotropic("CONC", 30000, 0.2, 0.0000055)
     section_name = "300x300 RC"
     ret = EtabsObject.PropFrame.SetRectangle(section_name, "CONC", 300, 300)
-    for id, line in lines.items():
+    for line_id, line in lines.items():
         point_i = line["node_i"]
         point_j = line["node_j"]
         ret, _ = EtabsObject.FrameObj.AddByPoint(
-            str(point_i), str(point_j), str(id), section_name, "Global"
+            str(point_i), str(point_j), str(line_id), section_name, "Global"
         )
-
+ 
     # Add rigid supports
     list_nodes = [1, 2, 5, 6]
     for node_id in list_nodes:
         ret = EtabsObject.PointObj.SetRestraint(str(node_id), [1, 1, 1, 1, 1, 1])
-
+ 
     EtabsObject.View.RefreshView(0, False)
+ 
     # Create the model and run the analysis
     file_path = Path.cwd() / "etabsmodel.edb"
     EtabsObject.File.Save(str(file_path))
     EtabsObject.Analyze.RunAnalysis()
-
+ 
     # Get the reaction loads
     load_case = "Dead"
     ret = EtabsObject.Results.Setup.DeselectAllCasesAndCombosForOutput()
@@ -73,15 +74,14 @@ def create_etabs_model():
             "R3": R3[0],
         }
         reactions_list.append(reaction)
-        
     # Save the output in a JSON
     output = Path.cwd() / "output.json"
     with open(output, "w") as jsonfile:
         json.dump(reactions_list, jsonfile)
-
+ 
     ret = EtabsEngine.ApplicationExit(False)
-
+ 
     return ret
-
+ 
 if __name__ == "__main__":
     create_etabs_model()
