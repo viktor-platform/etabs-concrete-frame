@@ -1,3 +1,6 @@
-app_type = "simple"
-python_version = "3.13"
-registered_name = "etabstest"
+app_type = 'simple'
+python_version = '3.12'
+registered_name = 'etabs-worker-test'
+worker_integrations = [
+    "etabs"
+]
